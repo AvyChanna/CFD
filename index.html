@@ -3,7 +3,7 @@
 
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <title>loadmapwithoptionsHTML</title>
+    <title>AAProdhan Disaster Management</title>
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
     <style type='text/css'>
         body {
@@ -75,10 +75,14 @@
             });
         }
         // TODO: Make action.php to store content
+        jQuery.support.cors = true;
+
         function save(lon, lat, info) {
             $.ajax({
                 async: 'false',
                 url: 'php/action.php',
+                contentType: "application/json; charset=utf-8",
+                dataType: "jsonp",
                 data: {
                     'lon': lon,
                     'lat': lat,
@@ -100,6 +104,8 @@
             $.ajax({
                 async: 'false',
                 url: 'php/action.php',
+                contentType: "application/json; charset=utf-8",
+                dataType: "jsonp",
                 data: {
                     'lon': lon,
                     'lat': lat,
@@ -117,14 +123,6 @@
             });
         }
     </script>
-    <FORM id="refresh">
-        <INPUT onClick="history.go(0)" type='hidden'>
-    </FORM>
-    <!-- <form action="index.php" id="myForm" method="post">
-                    <input name="longitude" id="longitude" value="26.1872126" type="hidden">
-                    <input name="latitude" id="latitude" value="91.6919173" type="hidden">
-                </form> -->
-
     <script>
         function b() {
             var pushpin = map.entities.get(0);
@@ -133,9 +131,12 @@
         }
     </script>
     <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?key=AuSKbt48qPuKTbppe7xfZCrtmJenR53woxwLB9zOqQJ-UNLvnXkwV3VqnDBUQEQk&callback=loadMapScenario'></script>
+    <script type='text/javascript' src='getData.js'></script>
     <script>
         $(window).load(function () {
+            var json = initURL('data.json');
             // TODO: add pins on load
+            console.log(json);
         });
     </script>
 </body>
