@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <title>AAProdhan Disaster Management</title>
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+    <style type='text/css'>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Helvetica, Arial, Sans-Serif
+        }
+    </style>
+</head>
+
+<body>
+    <div id='printoutPanel'></div>
+
+    <div id='myMap' style='width: 100vw; height: 100vh;'></div>
+    <script type='text/javascript'>
+        var map;
+        function loadMapScenario() {
+            var navigationBarMode = Microsoft.Maps.NavigationBarMode;
+            map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
+                center: new Microsoft.Maps.Location(26.1872126, 91.6919173),
+                mapTypeId: Microsoft.Maps.MapTypeId.road,
+                zoom: 15,
+                navigationBarMode: navigationBarMode.road,
+                supportedMapTypes: [Microsoft.Maps.MapTypeId.road]
+            });
+            $("#container").click(function () {
+                var pushpin = new Microsoft.Maps.Pushpin(map.getCenter(), {
+                    color: 'red'
+                });
+                map.entities.push(pushpin);
+            });
+            Microsoft.Maps.Events.addHandler(map, 'click', addpin);
+        }
+
+        function addpin(e) {
+            var keep = 0;
+            var point = new Microsoft.Maps.Point(e.getX(), e.getY());
+            var locTemp = e.target.tryPixelToLocation(point);
+            var location = new Microsoft.Maps.Location(locTemp.latitude, locTemp.longitude);
+            var pin = new Microsoft.Maps.Pushpin(location, {
+                'draggable': false,
+                enableHoverStyle: true
+            });
+            var info = prompt("Please describe your Emergency", "");
+            if (info.trim() != "") {
+                map.entities.push(pin);
+                var infobox = new Microsoft.Maps.Infobox(locTemp, {
+                    description: info,
+                    actions: [{
+                        label: "Remove",
+                        eventHandler: function (e) {
+                            console.log(e);
+                            // TODO: call remove function here with lon/lat
+
+                        }
+                    }]
+                });
+                infobox.setMap(map);
+                Microsoft.Maps.Events.addHandler(pin, 'click', function () {
+                    infobox.setOptions({
+                        visible: true
+                    });
+                });
+            }
+        }
+        // TODO: Make action.php to store content
+        jQuery.support.cors = true;
+
+        function save(lon, lat, info) {
+            $.ajax({
+                async: 'false',
+                url: 'php/action.php',
+                contentType: "application/json; charset=utf-8",
+                dataType: "jsonp",
+                data: {
+                    'lon': lon,
+                    'lat': lat,
+                    'info': info,
+                    'action': 'save'
+                },
+                type: 'POST',
+                success: function (result) {
+                    window.location.reload(true);
+                },
+                error: function (xhr) {
+                    alert("An error occured: " + xhr.status + " " + xhr.statusText);
+                    window.location.reload(true);
+                }
+            });
+        }
+
+        function remove(lon, lat, info) {
+            $.ajax({
+                async: 'false',
+                url: 'php/action.php',
+                contentType: "application/json; charset=utf-8",
+                dataType: "jsonp",
+                data: {
+                    'lon': lon,
+                    'lat': lat,
+                    'info': info,
+                    'action': 'remove'
+                },
+                type: 'POST',
+                success: function (result) {
+                    window.location.reload(true);
+                },
+                error: function (xhr) {
+                    alert("An error occured: " + xhr.status + " " + xhr.statusText);
+                    window.location.reload(true);
+                }
+            });
+        }
+    </script>
+    <script>
+        function b() {
+            var pushpin = map.entities.get(0);
+            map.entities.removeAt(0);
+            return pushpin;
+        }
+    </script>
+    <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?key=AuSKbt48qPuKTbppe7xfZCrtmJenR53woxwLB9zOqQJ-UNLvnXkwV3VqnDBUQEQk&callback=loadMapScenario'></script>
+    <script type='text/javascript' src='getData.js'></script>
+    <script>
+        $(window).load(function () {
+            var json = initURL('data.json');
+            // TODO: add pins on load
+            console.log(json);
+        });
+    </script>
+</body>
+
+</html>
